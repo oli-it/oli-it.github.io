@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Marquis Olinick: IT support home lab portfolio with resolved troubleshooting tickets.">
+<style>body{margin:0}img{max-width:100%}</style>
+<title>Marquis Olinick IT Lab</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: a service-desk queue. Profile header, lab setup strip, then resolved tickets newest first, each a ticket record with fields, steps and evidence. */
+:root {
+  --bg: #f4f6f8;
+  --surface: #ffffff;
+  --fg: #16202b;
+  --muted: #566475;
+  --line: #d9dfe6;
+  --accent: #1b55c9;
+  --accent-soft: #e6eefc;
+  --ok: #18794e;
+  --ok-soft: #e3f4ea;
+  --warn: #9a5b00;
+  --warn-soft: #fbf0dc;
+  --code-bg: #eef1f5;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f151c; --surface: #17202a; --fg: #e4e9ef; --muted: #9aa8b8; --line: #2a3644;
+    --accent: #7aa7ff; --accent-soft: #1a2a45; --ok: #5fd39a; --ok-soft: #133024;
+    --warn: #f0b85a; --warn-soft: #362812; --code-bg: #1e2934; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f151c; --surface: #17202a; --fg: #e4e9ef; --muted: #9aa8b8; --line: #2a3644;
+  --accent: #7aa7ff; --accent-soft: #1a2a45; --ok: #5fd39a; --ok-soft: #133024;
+  --warn: #f0b85a; --warn-soft: #362812; --code-bg: #1e2934; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg);
+  font-family: var(--font-body); font-size: 16px; line-height: 1.6;
+}
+.wrap {
+  max-width: 920px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 40px 64px;
+  display: flex; flex-direction: column; gap: 40px;
+}
+h1, h2, h3 { line-height: 1.2; text-wrap: balance; margin: 0; }
+p { margin: 0; }
+a { color: var(--accent); }
+a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+code, .mono { font-family: var(--font-mono); font-size: 0.88em; }
+code { background: var(--code-bg); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+.label {
+  font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--muted);
+}
+
+/* Header */
+header { display: flex; flex-direction: column; gap: 14px; }
+header h1 { font-size: clamp(30px, 5vw, 42px); font-weight: 700; letter-spacing: -0.01em; }
+.role { font-size: 19px; color: var(--muted); max-width: 62ch; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  font-size: 13px; font-weight: 500; padding: 4px 10px; border-radius: 999px;
+  border: 1px solid var(--line); background: var(--surface);
+}
+.chip.cert { border-color: transparent; background: var(--accent-soft); color: var(--accent); }
+.honesty {
+  border-left: 3px solid var(--accent); padding: 4px 0 4px 14px;
+  color: var(--muted); max-width: 70ch; font-size: 15px;
+}
+
+/* Lab setup */
+.setup { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+.machine {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
+  padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; min-width: 0;
+}
+.machine strong { font-family: var(--font-mono); font-size: 15px; }
+.machine span { font-size: 14px; color: var(--muted); }
+section { display: flex; flex-direction: column; gap: 16px; }
+section > h2 { font-size: 22px; }
+.section-note { color: var(--muted); font-size: 15px; max-width: 70ch; }
+
+/* Tickets */
+.ticket {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+  overflow: hidden; min-width: 0;
+}
+.ticket-head {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px;
+  padding: 18px 20px 14px; border-bottom: 1px solid var(--line);
+}
+.tid { font-family: var(--font-mono); font-weight: 600; color: var(--accent); font-size: 15px; }
+.ticket-head h3 { font-size: 19px; flex: 1 1 260px; min-width: 0; }
+.status {
+  font-family: var(--font-mono); font-size: 12px; font-weight: 600; letter-spacing: 0.06em;
+  text-transform: uppercase; padding: 3px 8px; border-radius: 4px;
+  background: var(--ok-soft); color: var(--ok);
+}
+.fields {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px 20px; padding: 14px 20px; border-bottom: 1px solid var(--line);
+  background: color-mix(in srgb, var(--bg) 55%, var(--surface));
+}
+.fields div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.fields .val { font-size: 14px; font-variant-numeric: tabular-nums; }
+.help-indep { color: var(--ok); }
+.help-some { color: var(--warn); }
+.ticket-body { padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 16px; }
+.complaint {
+  font-style: italic; background: var(--code-bg); border-radius: 6px;
+  padding: 12px 14px; max-width: 72ch;
+}
+.block { display: flex; flex-direction: column; gap: 6px; max-width: 72ch; }
+.block ol, .block ul { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 4px; }
+.evidence { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
+figure { margin: 0; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+figure a { display: block; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; line-height: 0; }
+figure img { width: 100%; height: auto; display: block; }
+figcaption { font-size: 13px; color: var(--muted); line-height: 1.45; }
+figcaption b { font-family: var(--font-mono); color: var(--fg); font-weight: 600; }
+.no-shots {
+  font-size: 14px; color: var(--muted); border: 1px dashed var(--line);
+  border-radius: 6px; padding: 10px 14px;
+}
+details { border-top: 1px solid var(--line); padding-top: 12px; }
+summary { cursor: pointer; font-weight: 600; font-size: 15px; }
+details p { margin-top: 8px; max-width: 72ch; color: var(--muted); }
+
+footer { color: var(--muted); font-size: 14px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header>
+    <span class="label">IT Support Home Lab · Portfolio</span>
+    <h1>Marquis Olinick</h1>
+    <p class="role">Aspiring Service Desk technician with 4+ years as a hardware and telecom technician. This page documents the troubleshooting tickets I work in my own Windows lab.</p>
+    <div class="chips">
+      <span class="chip cert">CompTIA Security+ · Sep 2026</span>
+      <span class="chip cert">CompTIA Network+ · Oct 2026</span>
+      <span class="chip cert">Year Up United · IT certification</span>
+      <a class="chip" href="https://www.linkedin.com/in/marquisolinickjr/" target="_blank" rel="noopener">LinkedIn ↗</a>
+    </div>
+    <p class="honesty">These are practice scenarios in a virtual lab I built. Faults are planted by an AI lab tutor without telling me the cause; I diagnose and fix them myself, and each ticket notes how much help I needed. One ticket (#004) is a real problem on my own laptop.</p>
+  </header>
+
+  <section aria-labelledby="lab-h">
+    <h2 id="lab-h">Lab setup</h2>
+    <div class="setup">
+      <div class="machine"><strong>Host</strong><span>Ubuntu laptop · VirtualBox 7.2 · 30 GB RAM, 8 cores</span></div>
+      <div class="machine"><strong>Win11-Practice</strong><span>Windows 11 client · snapshot reset after every ticket</span></div>
+      <div class="machine"><strong>DC-01</strong><span>Windows Server 2022 · future domain controller</span></div>
+      <div class="machine"><strong>Client-02</strong><span>Windows Server 2022 · domain member for the AD lab</span></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="tickets-h">
+    <h2 id="tickets-h">Resolved tickets</h2>
+    <p class="section-note">Newest first. Each one follows the same process: reproduce, find the cause, fix, verify, then explain it to the user in plain language.</p>
+
+    <!-- #004 -->
+    <article class="ticket" id="t004">
+      <div class="ticket-head">
+        <span class="tid">#004</span>
+        <h3>Firefox crashes at launch after an update</h3>
+        <span class="status">Resolved</span>
+      </div>
+      <div class="fields">
+        <div><span class="label">Date</span><span class="val">Nov 20, 2026</span></div>
+        <div><span class="label">System</span><span class="val">My own Ubuntu laptop (real issue)</span></div>
+        <div><span class="label">Category</span><span class="val">Application · Linux</span></div>
+        <div><span class="label">Help used</span><span class="val help-some">Guided by AI tutor</span></div>
+      </div>
+      <div class="ticket-body">
+        <p class="complaint">"Firefox won't open at all."</p>
+        <div class="block">
+          <span class="label">Investigation</span>
+          <ol>
+            <li>Launched Firefox from a terminal to read the error instead of guessing.</li>
+            <li>First error: a missing runtime package (<code>gnome-core26</code>) that the update needed. Installed and connected it.</li>
+            <li>Still crashed: version 160 had an image-loader bug. An older working version (159) was still on the system.</li>
+          </ol>
+        </div>
+        <div class="block">
+          <span class="label">Fix</span>
+          <ul>
+            <li>Backed up the Firefox profile (bookmarks, passwords, history) before changing anything.</li>
+            <li>Rolled back with <code>snap revert firefox</code> and paused updates for a week.</li>
+            <li>Opened once with <code>--allow-downgrade</code> rather than accepting "Create New Profile", so no data was lost.</li>
+          </ul>
+        </div>
+        <div class="block">
+          <span class="label">Verified</span>
+          <p>Firefox opens normally with all bookmarks and saved logins intact.</p>
+        </div>
+      </div>
+    </article>
+
+    <!-- #003 -->
+    <article class="ticket" id="t003">
+      <div class="ticket-head">
+        <span class="tid">#003</span>
+        <h3>Scary warning page opens at every sign-in</h3>
+        <span class="status">Resolved</span>
+      </div>
+      <div class="fields">
+        <div><span class="label">Date</span><span class="val">Nov 20, 2026</span></div>
+        <div><span class="label">System</span><span class="val">Windows 11 lab VM</span></div>
+        <div><span class="label">Category</span><span class="val">Malware cleanup · Startup</span></div>
+        <div><span class="label">Help used</span><span class="val help-some">A few hints</span></div>
+      </div>
+      <div class="ticket-body">
+        <p class="complaint">"Ever since I installed a free PC speed-up program, a red WARNING page opens every time I turn on my computer. I deleted the program from my desktop, but it keeps coming back."</p>
+        <div class="block">
+          <span class="label">Investigation</span>
+          <ol>
+            <li>Reproduced it: signed in and the page opened in Edge.</li>
+            <li>Read the address bar: <code>C:/Users/practice/AppData/Roaming/PCBoostPro/alert.html</code>, a local file, not a website.</li>
+            <li>Settings → Apps → Startup showed a "PCBoostPro" entry with no publisher.</li>
+            <li>Opened its file location: a <code>.cmd</code> script in the Startup folder. Read it in Notepad instead of running it. It launched the AppData page.</li>
+          </ol>
+        </div>
+        <div class="block">
+          <span class="label">Fix</span>
+          <ul>
+            <li>Deleted the trigger: <code>PCBoostPro.cmd</code> in the Startup folder.</li>
+            <li>Deleted the payload: the <code>%APPDATA%\PCBoostPro</code> folder.</li>
+          </ul>
+        </div>
+        <div class="block">
+          <span class="label">Verified</span>
+          <p>Restarted and signed in again: clean desktop, no pop-up. On a real client machine I would also uninstall the program, check Task Scheduler and browser extensions, and run a full Windows Security scan.</p>
+        </div>
+        <div class="evidence">
+          <figure>
+            <a href="img/003-1-startup-apps-PCBoostPro.jpg" target="_blank" rel="noopener"><img src="img/003-1-startup-apps-PCBoostPro.jpg" alt="Windows Settings, Apps, Startup list showing a PCBoostPro entry turned on with no publisher" loading="lazy" width="1600" height="880"></a>
+            <figcaption><b>1</b> Startup apps: PCBoostPro, no publisher, "Not measured".</figcaption>
+          </figure>
+          <figure>
+            <a href="img/003-2-startup-folder.jpg" target="_blank" rel="noopener"><img src="img/003-2-startup-folder.jpg" alt="File Explorer showing PCBoostPro.cmd in the Startup folder" loading="lazy" width="1600" height="880"></a>
+            <figcaption><b>2</b> The script sitting in the Startup folder.</figcaption>
+          </figure>
+          <figure>
+            <a href="img/003-3-script-in-notepad.jpg" target="_blank" rel="noopener"><img src="img/003-3-script-in-notepad.jpg" alt="Notepad showing the script, which starts an alert.html file in AppData" loading="lazy" width="1600" height="880"></a>
+            <figcaption><b>3</b> Read safely in Notepad: it opens a file in AppData.</figcaption>
+          </figure>
+          <figure>
+            <a href="img/003-4-appdata-payload.jpg" target="_blank" rel="noopener"><img src="img/003-4-appdata-payload.jpg" alt="File Explorer in AppData Roaming PCBoostPro showing alert.html" loading="lazy" width="1600" height="880"></a>
+            <figcaption><b>4</b> The payload folder in AppData\Roaming.</figcaption>
+          </figure>
+          <figure>
+            <a href="img/003-5-clean-after-reboot.jpg" target="_blank" rel="noopener"><img src="img/003-5-clean-after-reboot.jpg" alt="Clean Windows desktop after reboot with no pop-up" loading="lazy" width="1600" height="925"></a>
+            <figcaption><b>5</b> After reboot and sign-in: clean desktop.</figcaption>
+          </figure>
+        </div>
+        <details>
+          <summary>What I told the client</summary>
+          <p>"All fixed. The speed-up program had set itself to open a fake warning page every time you signed in. It was an ad trying to scare you into paying, not a real warning. I removed the auto-start entry and the hidden files behind it, and restarted to confirm it's gone. Real Windows warnings never ask you to buy anything."</p>
+        </details>
+      </div>
+    </article>
+
+    <!-- #002 -->
+    <article class="ticket" id="t002">
+      <div class="ticket-head">
+        <span class="tid">#002</span>
+        <h3>"A USB virus deleted all my files"</h3>
+        <span class="status">Resolved</span>
+      </div>
+      <div class="fields">
+        <div><span class="label">Date</span><span class="val">Nov 19, 2026</span></div>
+        <div><span class="label">System</span><span class="val">Windows 11 lab VM</span></div>
+        <div><span class="label">Category</span><span class="val">File recovery · CMD</span></div>
+        <div><span class="label">Help used</span><span class="val help-some">Several hints</span></div>
+      </div>
+      <div class="ticket-body">
+        <p class="complaint">"After I plugged in a USB stick, everything on my Desktop and in Documents disappeared."</p>
+        <div class="block">
+          <span class="label">Investigation</span>
+          <ol>
+            <li>Checked free disk space: unchanged, so the files were probably still there.</li>
+            <li>Listed the folders with <code>dir /a</code>, which shows hidden and system files. The files were present.</li>
+            <li>Cause: the hidden and system attributes (<code>+h +s</code>) had been set on them, a common USB-malware trick.</li>
+          </ol>
+        </div>
+        <div class="block">
+          <span class="label">Fix</span>
+          <ul>
+            <li>Cleared the attributes with <code>attrib -h -s</code> on the user's files only, leaving real Windows system files alone.</li>
+          </ul>
+        </div>
+        <div class="block">
+          <span class="label">Verified</span>
+          <p>All files visible again in File Explorer. Lesson learned: an admin Command Prompt starts in <code>System32</code>, so always <code>cd</code> to the right folder first.</p>
+        </div>
+        <p class="no-shots">Screenshots coming: I'm re-running this scenario to capture each step.</p>
+      </div>
+    </article>
+
+    <!-- #001 -->
+    <article class="ticket" id="t001">
+      <div class="ticket-head">
+        <span class="tid">#001</span>
+        <h3>No internet in the browser</h3>
+        <span class="status">Resolved</span>
+      </div>
+      <div class="fields">
+        <div><span class="label">Date</span><span class="val">Nov 19, 2026</span></div>
+        <div><span class="label">System</span><span class="val">Windows 11 lab VM</span></div>
+        <div><span class="label">Category</span><span class="val">Networking</span></div>
+        <div><span class="label">Help used</span><span class="val help-indep">Solved independently</span></div>
+      </div>
+      <div class="ticket-body">
+        <p class="complaint">"My internet stopped working. Websites won't load."</p>
+        <div class="block">
+          <span class="label">Investigation</span>
+          <ol>
+            <li>Read the browser's error message: it pointed at a proxy problem.</li>
+            <li>Ran <code>ping</code> to a public site: replies came back, so the connection and DNS worked.</li>
+            <li>Concluded the problem was browser traffic only, and checked Settings → Network &amp; internet → Proxy.</li>
+          </ol>
+        </div>
+        <div class="block">
+          <span class="label">Fix</span>
+          <ul><li>Removed a bogus manual proxy setting.</li></ul>
+        </div>
+        <div class="block">
+          <span class="label">Verified</span>
+          <p>Websites loaded normally again.</p>
+        </div>
+        <p class="no-shots">Screenshots coming: I'm re-running this scenario to capture each step.</p>
+      </div>
+    </article>
+  </section>
+
+  <section aria-labelledby="next-h">
+    <h2 id="next-h">Coming next</h2>
+    <p class="section-note">Active Directory on DC-01 (users, groups, Group Policy, domain join, password resets), PowerShell scripting, a ticketing system, and Azure / Entra ID.</p>
+  </section>
+
+  <footer>Updated Nov 20, 2026 · Connect with me on <a href="https://www.linkedin.com/in/marquisolinickjr/" target="_blank" rel="noopener">LinkedIn</a> · Resume available on request.</footer>
+</div>
+</body>
+</html>
