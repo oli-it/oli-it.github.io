@@ -281,7 +281,7 @@ footer { color: var(--muted); font-size: 14px; border-top: 1px solid var(--line)
         <span class="status">Resolved</span>
       </div>
       <div class="fields">
-        <div><span class="label">Date</span><span class="val">Nov 19, 2026</span></div>
+        <div><span class="label">Date</span><span class="val">Nov 19, 2026 (screenshots from a re-run, Nov 21)</span></div>
         <div><span class="label">System</span><span class="val">Windows 11 lab VM</span></div>
         <div><span class="label">Category</span><span class="val">File recovery · CMD</span></div>
         <div><span class="label">Help used</span><span class="val help-some">Several hints</span></div>
@@ -306,7 +306,24 @@ footer { color: var(--muted); font-size: 14px; border-top: 1px solid var(--line)
           <span class="label">Verified</span>
           <p>All files visible again in File Explorer. Lesson learned: an admin Command Prompt starts in <code>System32</code>, so always <code>cd</code> to the right folder first.</p>
         </div>
-        <p class="no-shots">Screenshots coming: I'm re-running this scenario to capture each step.</p>
+        <div class="evidence">
+          <figure>
+            <a href="img/002-1-documents-empty.jpg" target="_blank" rel="noopener"><img src="img/002-1-documents-empty.jpg" alt="File Explorer showing the Documents folder as empty, 0 items" loading="lazy" width="1600" height="925"></a>
+            <figcaption><b>1</b> Documents looks empty: "This folder is empty", 0 items.</figcaption>
+          </figure>
+          <figure>
+            <a href="img/002-2-dir-a-shows-files.jpg" target="_blank" rel="noopener"><img src="img/002-2-dir-a-shows-files.jpg" alt="Command Prompt dir /a listing showing the hidden files on the Desktop and in Documents" loading="lazy" width="1600" height="925"></a>
+            <figcaption><b>2</b> <code>dir /a</code> shows every file is still there, just hidden.</figcaption>
+          </figure>
+          <figure>
+            <a href="img/002-3-attrib-fix.jpg" target="_blank" rel="noopener"><img src="img/002-3-attrib-fix.jpg" alt="Command Prompt running attrib -h -s on each user file, with the Desktop icons reappearing" loading="lazy" width="1600" height="925"></a>
+            <figcaption><b>3</b> <code>attrib -h -s</code> on each user file only (desktop.ini left alone).</figcaption>
+          </figure>
+          <figure>
+            <a href="img/002-4-files-restored.jpg" target="_blank" rel="noopener"><img src="img/002-4-files-restored.jpg" alt="File Explorer showing Invoices, Resume 2026 and Tax Return 2025 back in Documents, with Desktop files visible" loading="lazy" width="1600" height="925"></a>
+            <figcaption><b>4</b> All files visible again in Documents and on the Desktop.</figcaption>
+          </figure>
+        </div>
       </div>
     </article>
 
@@ -318,7 +335,7 @@ footer { color: var(--muted); font-size: 14px; border-top: 1px solid var(--line)
         <span class="status">Resolved</span>
       </div>
       <div class="fields">
-        <div><span class="label">Date</span><span class="val">Nov 19, 2026</span></div>
+        <div><span class="label">Date</span><span class="val">Nov 19, 2026 (screenshots from a re-run, Nov 21)</span></div>
         <div><span class="label">System</span><span class="val">Windows 11 lab VM</span></div>
         <div><span class="label">Category</span><span class="val">Networking</span></div>
         <div><span class="label">Help used</span><span class="val help-indep">Solved independently</span></div>
@@ -341,7 +358,28 @@ footer { color: var(--muted); font-size: 14px; border-top: 1px solid var(--line)
           <span class="label">Verified</span>
           <p>Websites loaded normally again.</p>
         </div>
-        <p class="no-shots">Screenshots coming: I'm re-running this scenario to capture each step.</p>
+        <div class="evidence">
+          <figure>
+            <a href="img/001-1-browser-error.jpg" target="_blank" rel="noopener"><img src="img/001-1-browser-error.jpg" alt="Edge showing You are not connected, ERR_PROXY_CONNECTION_FAILED" loading="lazy" width="1600" height="925"></a>
+            <figcaption><b>1</b> Edge error: <code>ERR_PROXY_CONNECTION_FAILED</code>.</figcaption>
+          </figure>
+          <figure>
+            <a href="img/001-2-ping-works.jpg" target="_blank" rel="noopener"><img src="img/001-2-ping-works.jpg" alt="Command Prompt ping google.com with 4 replies and 0 percent loss" loading="lazy" width="1600" height="925"></a>
+            <figcaption><b>2</b> <code>ping</code> works: network and DNS are fine.</figcaption>
+          </figure>
+          <figure>
+            <a href="img/001-3-bogus-proxy.jpg" target="_blank" rel="noopener"><img src="img/001-3-bogus-proxy.jpg" alt="Windows proxy settings showing a manual proxy on 127.0.0.1 port 8899" loading="lazy" width="1600" height="925"></a>
+            <figcaption><b>3</b> The cause: a manual proxy pointing at 127.0.0.1:8899.</figcaption>
+          </figure>
+          <figure>
+            <a href="img/001-4-proxy-off.jpg" target="_blank" rel="noopener"><img src="img/001-4-proxy-off.jpg" alt="Windows proxy settings with Use a proxy server turned off" loading="lazy" width="1600" height="925"></a>
+            <figcaption><b>4</b> Manual proxy turned off.</figcaption>
+          </figure>
+          <figure>
+            <a href="img/001-5-website-loads.jpg" target="_blank" rel="noopener"><img src="img/001-5-website-loads.jpg" alt="Edge loading a Bing search results page normally" loading="lazy" width="1600" height="925"></a>
+            <figcaption><b>5</b> Websites load again.</figcaption>
+          </figure>
+        </div>
       </div>
     </article>
   </section>
