@@ -162,14 +162,89 @@ footer { color: var(--muted); font-size: 14px; border-top: 1px solid var(--line)
     <div class="setup">
       <div class="machine"><strong>Host</strong><span>Ubuntu laptop · VirtualBox 7.2 · 30 GB RAM, 8 cores</span></div>
       <div class="machine"><strong>Win11-Practice</strong><span>Windows 11 client · snapshot reset after every ticket</span></div>
-      <div class="machine"><strong>DC-01</strong><span>Windows Server 2022 · future domain controller</span></div>
-      <div class="machine"><strong>Client-02</strong><span>Windows Server 2022 · domain member for the AD lab</span></div>
+      <div class="machine"><strong>DC-01</strong><span>Windows Server 2022 · domain controller (AD DS, DNS, Group Policy)</span></div>
+      <div class="machine"><strong>Client-02</strong><span>Windows Server 2022 · domain-joined client for sign-in testing</span></div>
     </div>
   </section>
 
   <section aria-labelledby="tickets-h">
     <h2 id="tickets-h">Resolved tickets</h2>
     <p class="section-note">Newest first. Each one follows the same process: reproduce, find the cause, fix, verify, then explain it to the user in plain language.</p>
+
+    <!-- #005 -->
+    <article class="ticket" id="t005">
+      <div class="ticket-head">
+        <span class="tid">#005</span>
+        <h3>Finance user locked out and forgot her password</h3>
+        <span class="status">Resolved</span>
+      </div>
+      <div class="fields">
+        <div><span class="label">Date</span><span class="val">Nov 21, 2026</span></div>
+        <div><span class="label">System</span><span class="val">Windows Server 2022 domain (DC-01 + Client-02)</span></div>
+        <div><span class="label">Category</span><span class="val">Active Directory · Accounts · PowerShell</span></div>
+        <div><span class="label">Help used</span><span class="val help-some">Guided by AI tutor</span></div>
+      </div>
+      <div class="ticket-body">
+        <p class="complaint">"This is Alice in Finance. I can't sign in. It says my account is locked, and I don't remember my password anymore."</p>
+        <div class="block">
+          <span class="label">Setup</span>
+          <ol>
+            <li>Organized the domain like a small company: a <code>Company</code> OU with IT, Finance and Sales OUs, one security group per department, and three new-hire accounts created with PowerShell (temporary password, must change at first sign-in).</li>
+            <li>Turned on an account lockout policy: 5 failed attempts locks the account for 30 minutes.</li>
+            <li>Reproduced the problem as the user: 6 wrong passwords on Client-02 gave "The referenced account is currently locked out".</li>
+          </ol>
+        </div>
+        <div class="block">
+          <span class="label">Investigation</span>
+          <ol>
+            <li>Verified the caller's identity before touching the account (standard service desk practice).</li>
+            <li>Found the locked account on the domain controller with <code>Search-ADAccount -LockedOut</code>: Alice Brown (<code>abrown</code>).</li>
+          </ol>
+        </div>
+        <div class="block">
+          <span class="label">Fix</span>
+          <ul>
+            <li>Unlocked it: <code>Unlock-ADAccount -Identity abrown</code>.</li>
+            <li>Set a temporary password with <code>Set-ADAccountPassword -Reset</code>.</li>
+            <li>Required a new password at next sign-in: <code>Set-ADUser -ChangePasswordAtLogon $true</code>, so only the user knows her final password.</li>
+          </ul>
+        </div>
+        <div class="block">
+          <span class="label">Verified</span>
+          <p><code>Get-ADUser</code> showed LockedOut False and Enabled True. The user then signed in on Client-02 with the temporary password, chose her own, and got "Your password has been changed".</p>
+        </div>
+        <div class="evidence">
+          <figure>
+            <a href="img/005-1-existing-domain.jpg" target="_blank" rel="noopener"><img src="img/005-1-existing-domain.jpg" alt="PowerShell on DC-01 listing domain users, the two joined computers DC-01 and CLIENT-02, and Group Policy objects including Map Z Drive" loading="lazy" width="1600" height="925"></a>
+            <figcaption><b>1</b> Domain inventory: users, joined computers, Group Policies.</figcaption>
+          </figure>
+          <figure>
+            <a href="img/005-2-ous-users-created.jpg" target="_blank" rel="noopener"><img src="img/005-2-ous-users-created.jpg" alt="PowerShell creating the Company OU, department OUs and groups, and three users abrown, cdiaz and dlee" loading="lazy" width="1600" height="925"></a>
+            <figcaption><b>2</b> OUs, groups and three new hires created with PowerShell.</figcaption>
+          </figure>
+          <figure>
+            <a href="img/005-3-locked-out.jpg" target="_blank" rel="noopener"><img src="img/005-3-locked-out.jpg" alt="Windows sign-in screen on Client-02 saying the referenced account is currently locked out" loading="lazy" width="1600" height="925"></a>
+            <figcaption><b>3</b> The user's view: account locked out.</figcaption>
+          </figure>
+          <figure>
+            <a href="img/005-4-search-lockedout.jpg" target="_blank" rel="noopener"><img src="img/005-4-search-lockedout.jpg" alt="Search-ADAccount -LockedOut returning Alice Brown, abrown" loading="lazy" width="1600" height="128"></a>
+            <figcaption><b>4</b> Found the locked account on the DC.</figcaption>
+          </figure>
+          <figure>
+            <a href="img/005-5-unlock-reset.jpg" target="_blank" rel="noopener"><img src="img/005-5-unlock-reset.jpg" alt="PowerShell unlocking abrown, resetting the password, and showing LockedOut False and Enabled True" loading="lazy" width="1600" height="235"></a>
+            <figcaption><b>5</b> Unlocked, reset, forced change: LockedOut False.</figcaption>
+          </figure>
+          <figure>
+            <a href="img/005-6-password-changed.jpg" target="_blank" rel="noopener"><img src="img/005-6-password-changed.jpg" alt="Client-02 sign-in screen saying your password has been changed" loading="lazy" width="1600" height="925"></a>
+            <figcaption><b>6</b> User set her own password and signed in.</figcaption>
+          </figure>
+        </div>
+        <details>
+          <summary>What I told the user</summary>
+          <p>"You're unlocked. After too many wrong tries, the account locks itself for security, so nobody can keep guessing your password. I've given you a temporary password. When you sign in, Windows will ask you to pick a new one that only you know. If it happens again, call us and we'll sort it out right away."</p>
+        </details>
+      </div>
+    </article>
 
     <!-- #004 -->
     <article class="ticket" id="t004">
@@ -386,7 +461,7 @@ footer { color: var(--muted); font-size: 14px; border-top: 1px solid var(--line)
 
   <section aria-labelledby="next-h">
     <h2 id="next-h">Coming next</h2>
-    <p class="section-note">Active Directory on DC-01 (users, groups, Group Policy, domain join, password resets), PowerShell scripting, a ticketing system, and Azure / Entra ID.</p>
+    <p class="section-note">More Active Directory tickets (group access to shared drives, Group Policy troubleshooting), PowerShell scripting, a ticketing system, and Azure / Entra ID.</p>
   </section>
 
   <footer>Updated Nov 21, 2026 · Connect with me on <a href="https://www.linkedin.com/in/marquisolinickjr/" target="_blank" rel="noopener">LinkedIn</a> · Resume available on request.</footer>
